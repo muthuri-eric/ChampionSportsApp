@@ -1,0 +1,166 @@
+﻿@page "/trainers"
+@attribute [Authorize(Roles ="Admin")]
+@using ChampionsDbHelper.Data
+@using ChampionsDbHelper.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using System.Text.Encodings.Web
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using Microsoft.AspNetCore.WebUtilities
+@using ChampionSports.Data
+
+@inject ITrainerData trainerData
+@inject IUserStore<ApplicationUser> UserStore
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-2">
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Add Trainer
+        </button>
+    </div>
+    <div class="col-2">
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#accessbackdrop">
+            Manage Access
+        </button>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Trainer</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm FormName="createtrainer" Model="trainer" OnSubmit="AddTrainer">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="staffnumber">StaffNumber</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputText style="width:60%" id="staffNumber" @bind-Value="trainer.StaffNumber" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="title-text">Title</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputText style="width:60%" id="title-text" @bind-Value="trainer.Title" />
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="firstname-text">First Name</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputText style="width:60%" id="firstname-text" @bind-Value="trainer.FirstName" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="lastname-text">Last Name</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputText style="width:60%" id="lastname-text" @bind-Value="trainer.LastName" />
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="accessbackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header mb-3">
+                <h1 class="modal-title fs-5">Add as User</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+<div class="row m-2 mb-5">
+    <div class="col-md-12">
+        <StatusMessage Message="@Message" />
+        <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="form-floating mb-3">
+                <InputSelect style="width:100%" @bind-Value="@Input.Id">
+                    @if(trainers is not null)
+                    
+                                {
+                                    <option value=""></option>
+                                    @foreach(var trainer in trainers)
+                                    {
+                                        <option value="@trainer.TrainerId">@trainer.FirstName @trainer.LastName</option>
+                                        
+                                    }
+                                }
+                </InputSelect>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label for="email">Email</label>
+                <ValidationMessage For="() => Input.Email" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label for="password">Password</label>
+                <ValidationMessage For="() => Input.Password" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label for="confirm-password">Confirm Password</label>
+                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-primary" data-bs-dismiss="modal" >Register</button>
+        </EditForm>
+    </div>
+
+</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-3 bg-secondary text-white">Staff Number</div>
+    <div class="col-3 bg-secondary text-white">Title</div>
+    <div class="col-2 bg-secondary text-white">First Name</div>
+    <div class="col-2 bg-secondary text-white">Last Name</div>
+    <div class="col-2 bg-secondary text-white"></div>
+</div>
+@if (trainers is null)
+{
+    <h5>Loading.....</h5>
+}
+else
+    foreach (Trainer trainer in trainers)
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col-3">@trainer.StaffNumber</div>
+                <div class="col-3">@trainer.Title</div>
+                <div class="col-2">@trainer.FirstName</div>
+                <div class="col-2">@trainer.LastName</div>
+                <div class="col-2"></div>
+            </div>
+        </div>
+        
+    }
+
+
+

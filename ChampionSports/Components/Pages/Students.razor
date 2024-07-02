@@ -1,0 +1,180 @@
+﻿@page "/students"
+@attribute [Authorize]
+@using ChampionSports.Data
+@using ChampionsDbHelper.Data
+@using ChampionsDbHelper.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+
+@inject IStudentData studentData
+@inject IUserStore<ApplicationUser> UserStore
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-2">
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Add Student
+        </button>
+    </div>
+    <div class="col-2">
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#accessbackdrop">
+            Manage Access
+        </button>
+    </div>
+</div>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Student</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm FormName="createtrainer" Model="@student" OnSubmit="AddStudent">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+            <div class="modal-body">
+
+                    <div>
+                        <div class="col-3">
+                            <label for="studentnumber">StudentNumber</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputText style="width:60%" id="studentnumber" @bind-Value="student.StudentNumber" />
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-3">
+                            <label for="gradelevel">Grade</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputNumber style="width:60%" id="gradelevel" @bind-Value="student.GradeLevelId" />
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-3">
+                            <label for="gender">Gender</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputSelect style="width:60%" id="gradelevel" @bind-Value="student.Gender">
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-3">
+                            <label for="firstname-text">First Name</label>
+                        </div>
+                        <div class="col-7 mb-2">
+
+                            <InputText style="width:60%" id="firstname-text" @bind-Value="student.FirstName" />
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-3">
+                            <label for="lastname-text">Last Name</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputText style="width:60%" id="lastname-text" @bind-Value="student.LastName" />
+                        </div>
+
+                    </div>   
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="accessbackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header mb-3">
+                <h1 class="modal-title fs-5">Add as user</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+<div class="row m-2 mb-5">
+    <div class="col-md-12">
+        <StatusMessage Message="@Message" />
+        <EditForm Model="Input"  method="post" OnValidSubmit="RegisterUser" FormName="register">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="form-floating mb-3">
+                <InputSelect style="width:100%" @bind-Value="@Input.Id">
+                    @if(students is not null)
+                    
+                                {
+                                    <option value=""></option>
+                                    @foreach(var student in students)
+                                    {
+                                        <option value="@student.StudentId">@student.FirstName @student.LastName</option>
+                                        
+                                    }
+                                }
+                </InputSelect>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label for="email">Email</label>
+                <ValidationMessage For="() => Input.Email" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label for="password">Password</label>
+                <ValidationMessage For="() => Input.Password" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label for="confirm-password">Confirm Password</label>
+                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-primary" data-bs-dismiss="modal" >Register</button>
+        </EditForm>
+    </div>
+
+</div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-3 bg-secondary text-white">Student Number</div>
+        <div class="col-2 bg-secondary text-white">Grade</div>
+        <div class="col-3 bg-secondary text-white">First Name</div>
+        <div class="col-3 bg-secondary text-white">Last Name</div>
+        <div class="col-1 bg-secondary text-white">Gender</div>
+    </div>
+</div>
+@if (students is null)
+{
+    <h5>Loading.....</h5>
+}
+else
+    foreach (Student student in students)
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col-3">@student.StudentNumber</div>
+                <div class="col-2">@student.GradeLevelId</div>
+                <div class="col-3">@student.FirstName</div>
+                <div class="col-3">@student.LastName</div>
+                    @switch (student.Gender)
+                    {
+                    case Gender.M:
+                        <div class="col-1">Male</div>
+                        break;
+                    case Gender.F:
+                        <div class="col-1">Female</div>
+                        break;  
+                    }
+            </div>
+        </div>
+    }
+

@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>ChampionsDb</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{6fcb287f-21f3-4d9c-bff2-2f9e5a5bc356}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql140DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>ChampionsDB</RootNamespace>
+    <AssemblyName>ChampionsDB</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+    <GenerateCreateScript>False</GenerateCreateScript>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Security\" />
+    <Folder Include="Server Objects\" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Stored Procedures" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Security\sa.sql" />
+    <Build Include="Security\DESKTOP-LPNF2BM_User.sql" />
+    <Build Include="Security\NT SERVICE_SQLWriter.sql" />
+    <Build Include="Security\RoleMemberships.sql" />
+    <Build Include="Server Objects\AlwaysOn_health.sql" />
+    <Build Include="dbo\Tables\AspNetUserTokens.sql" />
+    <Build Include="dbo\Tables\AspNetUsers.sql" />
+    <Build Include="dbo\Tables\AspNetUserRoles.sql" />
+    <Build Include="dbo\Tables\AspNetUserLogins.sql" />
+    <Build Include="dbo\Tables\AspNetUserClaims.sql" />
+    <Build Include="dbo\Tables\AspNetRoles.sql" />
+    <Build Include="dbo\Tables\AspNetRoleClaims.sql" />
+    <Build Include="dbo\Tables\__EFMigrationsHistory.sql" />
+    <Build Include="dbo\Tables\Trainee.sql" />
+    <Build Include="dbo\Tables\SportEvent.sql" />
+    <Build Include="dbo\Tables\Sport.sql" />
+    <Build Include="dbo\Tables\Equipment.sql" />
+    <Build Include="dbo\Stored Procedures\spTraineeInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spSportEventInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spEquipmentInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spSportInsert.sql" />
+    <Build Include="dbo\Tables\GradeLevel.sql" />
+    <Build Include="dbo\Tables\Lesson.sql" />
+    <Build Include="dbo\Tables\Student.sql" />
+    <Build Include="dbo\Stored Procedures\spTraineeGetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spTraineeGetById.sql" />
+    <Build Include="dbo\Stored Procedures\spTraineeUpdate.sql" />
+    <Build Include="dbo\Stored Procedures\spStudentInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spStudentGetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spStudentGetById.sql" />
+    <Build Include="dbo\Stored Procedures\spStudentUpdate.sql" />
+    <Build Include="dbo\Stored Procedures\spSportEventGetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spSportEventGetById.sql" />
+    <Build Include="dbo\Stored Procedures\spSportEventUpdate.sql" />
+    <Build Include="dbo\Stored Procedures\spSportGetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spSportGetById.sql" />
+    <Build Include="dbo\Stored Procedures\spSportUpdate.sql" />
+    <Build Include="dbo\Stored Procedures\spLessonInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spLessonGetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spLessonGetById.sql" />
+    <Build Include="dbo\Stored Procedures\spLessonUpdate.sql" />
+    <Build Include="dbo\Stored Procedures\spGradeLevelInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spGradeLevelGetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spGradeLevelGetById.sql" />
+    <Build Include="dbo\Stored Procedures\spGradeLevelUpdate.sql" />
+    <Build Include="dbo\Stored Procedures\spEquipmentGetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spEquipmentGetById.sql" />
+    <Build Include="dbo\Stored Procedures\spEquipmentUpdate.sql" />
+    <Build Include="dbo\Tables\Trainer.sql" />
+    <Build Include="dbo\Stored Procedures\spTrainerInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spTrainerGetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spTrainerGetById.sql" />
+    <Build Include="dbo\Stored Procedures\spTrainerUpdate.sql" />
+    <Build Include="dbo\Tables\Subject.sql" />
+    <Build Include="dbo\Tables\EquipmentDetail.sql" />
+    <Build Include="dbo\Stored Procedures\spEquipmentDetailUpdate.sql" />
+    <Build Include="dbo\Stored Procedures\spEquipmentDetailInsert.sql" />
+    <Build Include="dbo\Tables\Activity.sql" />
+    <Build Include="dbo\Stored Procedures\spActivityInsert.sql" />
+    <Build Include="dbo\Stored Procedures\spActivityUpdate.sql" />
+    <Build Include="dbo\Stored Procedures\spActivityGetByTrainee.sql" />
+    <Build Include="dbo\Stored Procedures\spActivityGetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spEquipmentDetailGetAll.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="ChampionsDB.refactorlog" />
+  </ItemGroup>
+</Project>

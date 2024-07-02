@@ -1,0 +1,130 @@
+﻿@page "/lessons"
+@attribute [Authorize]
+@using ChampionsDbHelper.Data
+@using ChampionsDbHelper.Models
+@using Microsoft.AspNetCore.Authorization
+@inject ILessonData lessonData
+@inject IGradeLevelData gradeLevelData
+@inject ISubjectData subjectData
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-1">
+        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Add
+        </button>
+    </div>
+</div>
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Training Sesson</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm FormName="createlesson" Model="lesson" OnSubmit="CreateLesson">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+            <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="lessonGradeLevel-select">Grade</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputSelect style="width:60%" id="lessonGradeLevel-select" @bind-Value="lesson.GradeLevelId">
+                                @if (gradeLevels is not null)
+                                {
+                                    <option value=""></option>
+                                    @foreach (var gradeLevel in gradeLevels)
+                                    {
+                                        <option value="@gradeLevel.GradeLevelId"> Grade @gradeLevel.GradeNumber</option>
+                                    }
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="subject-text">Subject</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputSelect style="width:60%" id="subject-text" @bind-Value="lesson.SubjectId">
+                                @if (subjects is not null)
+                                {
+                                    <option value=""></option>
+                                    foreach (var subject in subjects)
+                                    {
+                                        <option value="@subject.SubjectId">@subject.SubjectName</option>
+                                    }
+                                }
+
+                            </InputSelect>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="lessondate">Date</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputDate style="width:60%" id="lessondate" @bind-Value="lesson.LessonDate"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="lesson-start">Lesson Start</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputDate style="width:60%" id="lesson-start" Type="InputDateType.Time" @bind-Value="lesson.StartTime" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="lesson-end">Lesson End</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputDate style="width:60%" id="lesson-end" Type="InputDateType.Time" @bind-Value="lesson.EndTime" />
+                        </div>
+
+                    </div>
+ 
+            </div>
+            <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+            </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-3 bg-secondary text-white">Date</div>
+        <div class="col-2 bg-secondary text-white">GradeLevel</div>
+        <div class="col-2 bg-secondary text-white">Subject</div>
+        <div class="col-2 bg-secondary text-white">Lesson Start</div>
+        <div class="col-3 bg-secondary text-white">Lesson End</div>
+    </div>
+</div>
+@if (peLessons is null)
+{
+    <h5>Loading.....</h5>
+}
+else
+    foreach (Lesson lesson in peLessons)
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col-3">@lesson.LessonDate.ToLongDateString()</div>
+                <div class="col-2">@lesson.GradeLevelId</div>
+                <div class="col-2">@subjects.Where(x => x.SubjectId== lesson.SubjectId).FirstOrDefault()?.SubjectName</div>
+                <div class="col-2">@lesson.StartTime</div>
+                <div class="col-3">@lesson.EndTime</div>
+            </div>
+        </div>
+    }
+

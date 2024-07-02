@@ -1,0 +1,246 @@
+﻿@page "/matches"
+@attribute [Authorize]
+@using ChampionSports.Data
+@using ChampionsDbHelper.Data
+@using ChampionsDbHelper.Models
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@inject NavigationManager navManager
+@inject UserManager<ApplicationUser> userManager
+@inject RoleManager<IdentityRole> roleManager
+
+@inject ISportEventData eventsData
+@inject ILessonData lessonData
+@inject ISportData sportData
+@inject ITrainerData trainerData
+@inject ITraineeData traineeData
+@inject ISubjectData subjectData
+@inject IGradeLevelData gradeLevelData
+@inject IStudentData studentData
+@rendermode InteractiveServer
+
+<div class="row mb-2">
+    <div class="col-2">
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#matchBackdrop">
+            Create Match
+        </button>
+    </div>
+    <div class="col-5">
+        <button type="button" class="btn btn-info" @onclick="() => LoadPreview()">
+            Attendance Preview
+        </button>
+    </div>
+</div>
+<div class="modal fade" id="matchBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+     tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Create Match/Sport Event</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm FormName="createevent" Model="@sportEvent" OnValidSubmit="CreateSportEvent">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col col-2">
+                            <label for="lessonId-select">Session</label>
+                        </div>
+                        <div class="col col-7 mb-2">
+                            <InputSelect style="width:60%" id="lessonId-select" @bind-Value="@sportEvent.LessonId">
+                                @if (lessons is not null)
+                                {
+                                    <option value=""></option>
+                                    @foreach (Lesson lesson in lessons)
+                                    {
+                                        <option value="@lesson.LessonId">
+                                            Grade @gradeLevels.Where(x => x.GradeLevelId == lesson.GradeLevelId).FirstOrDefault()?.GradeNumber
+                                            @lessons.Where(x => x.LessonId == lesson.LessonId).FirstOrDefault()?.StartTime -
+                                            @lessons.Where(x => x.LessonId == lesson.LessonId).FirstOrDefault()?.EndTime
+                                        </option>
+
+                                    }
+                                }
+                            </InputSelect>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col col-2">
+                            <label for="sport-select">Sport</label>
+                        </div>
+                        <div class="col col-7 mb-2">
+                            <MyInputSelect style="width:60%" id="sport-select" @bind-Value="@sportEvent.SportId">
+                                @if (sports is not null)
+                                {
+                                    <option value=""></option>
+                                    @foreach (Sport sport in sports)
+                                    {
+                                        if (sport.SportDescription is not null)
+                                        {
+                                            <option value="@sport.SportId">@sport.SportDescription</option>
+                                        }
+                                    }
+                                }
+                            </MyInputSelect>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col col-2">
+                            <label for="trainer-select">Trainer</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <MyInputSelect style="width:60%" id="trainer-select" @bind-Value="@sportEvent.TrainerId">
+                                @if (trainers is not null)
+                                {
+                                    <option value=""></option>
+                                    @foreach (Trainer trainer in trainers)
+                                    {
+                                        <option value="@trainer.TrainerId">@trainer.Title @trainer.FirstName @trainer.LastName</option>
+                                    }
+                                }
+                            </MyInputSelect>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col col-2">
+                            <label for="sportevent-text">Description</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputText style="width:60%" id="sportevent-text" @bind-Value="sportEvent.MatchDescription" />
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col col-2">
+                            <label for="sportevent-text">Location</label>
+                        </div>
+                        <div class="col col-7 mb2">
+                            <InputText style="width:60%" id="sportevent-text" @bind-Value="sportEvent.Location" />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-10">
+        @if (sportEvents is null)
+        {
+            <h5>No Matches Available</h5>
+        }
+        else
+
+            foreach (SportEvent sp in orderedEvents)
+            {
+                <div class="card bg-light mb-2">
+                    <div class="card-body">
+                        <div class="container">
+                            <div class="card-title bg-dark">
+                                <div class="row">
+                                    <div class="col-4"></div>
+                                    <div class="col-4">
+                                        <div class="text-white">
+                                            <b>
+                                                @gradeLevels.Where(x => x.GradeLevelId == lessons?.Where(x => x.LessonId == sp.LessonId).FirstOrDefault()?.GradeLevelId).FirstOrDefault()?.Description
+                                                @sports?.Where(x => x.SportId == sp.SportId).FirstOrDefault()?.SportDescription
+                                            </b>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-4"></div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="card-text"><b>Date :</b>  @lessons.Where(x => x.LessonId == sp.LessonId).FirstOrDefault()?.LessonDate.ToShortDateString()</div>
+                                    <div class="card-text"><b>Start Time :</b>  @sp.StartTime</div>
+                                    <div class="card-text"><b>End Time : </b> @sp.EndTime</div>
+                                    <div class="card-text"><b>Venue : </b> @sp.Location</div>
+                                </div>
+                                <div class="col-4">
+                                    
+                                </div>
+                                <div class="col-4">
+                                    @if(sp.IsFullyAttended)
+                                    {
+                                        <div class="bg-success text-white" style="text-align:center"><b>Fully Attended</b></div>
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-danger text-white" style="text-align:center"><b>Partially or Not Attended</b></div>
+                                    }
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                        <div class="container">
+                           <div class="row">
+                            <div class="col-4"></div>
+                            <div class="col-4">
+                                <div class="btn btn-primary" @onclick="() => LoadParticipants(sp.SportEventId)">Participants</div>
+                            </div>
+                            <div class="col-4">
+                            </div>
+
+                        </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            }
+    </div>
+    <div class="col-2">
+        <div class="row">
+            <div class="row d-flex justify-content-center g-1">
+                <div class="col-auto">
+                    <label for="sport-select">Filter Sport</label>
+                </div>
+            </div>
+            <div class="row d-flex justify-content-center g-1">
+                <div class="col-auto">
+                    <MyInputSelect id=" sport-select" @bind-Value="@Model.Id">
+                        @if (sports is not null)
+                        {
+                            <option value=""></option>
+                            @foreach (Sport sport in sports)
+                            {
+                                if (sport.SportDescription is not null)
+                                {
+                                    <option value="@sport.SportId">@sport.SportDescription</option>
+                                }
+                            }
+                        }
+                    </MyInputSelect>
+                </div>
+            </div>
+            <div class="row d-flex justify-content-center g-1">
+                <div class="col-auto">
+                    <button class="btn btn-secondary " @onclick="()=>Filter(Model.Id)">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

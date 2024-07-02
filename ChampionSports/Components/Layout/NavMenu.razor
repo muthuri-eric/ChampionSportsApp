@@ -1,0 +1,95 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@implements IDisposable
+@inject NavigationManager NavigationManager
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">ChampionSports</a>
+    </div>
+</div>
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        <AuthorizeView Roles="Admin, Trainer">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Matches">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Matches/Events
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles="Trainee">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="traineedashboard">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> My Events
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles="Admin">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Trainers">
+                    <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Trainers
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles="Admin">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Equipments">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Equipments
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView Roles="Admin, Trainer">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Students">
+                    <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Students
+                </NavLink>
+            </div>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="Admin">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="sports">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Sports
+                </NavLink>
+            </div>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="Admin">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="lessons">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Sessons TimeTable
+                </NavLink>
+            </div>
+        </AuthorizeView>
+
+    </nav>
+</div>
+
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}
+

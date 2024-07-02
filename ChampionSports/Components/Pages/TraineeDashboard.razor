@@ -1,0 +1,176 @@
+﻿@page "/traineedashboard"
+@using ChampionSports.Data
+@using ChampionsDbHelper.Data
+@using ChampionsDbHelper.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@attribute [Authorize]
+@inject IActivityData activityData
+@inject ISportEventData eventData
+@inject ISportData sportData
+@inject IGradeLevelData gradeLevelData
+@inject ILessonData lessonData
+@inject ITraineeData traineeData
+@inject IStudentData studentData
+@inject IEquipmentData equipmentData
+@inject UserManager<ApplicationUser> userManager
+@rendermode InteractiveServer
+
+
+@if(trainees is not null)
+{
+    @foreach (var trainee in trainees)
+    {
+        <div>
+            <div class="container d-flex justify-content-center bg-dark text-white"><strong>
+                    @GradeLevels.Where(x => x.GradeLevelId == Lessons?.Where(x => x.LessonId == SportEvents.Where(x => x.SportEventId == trainee.SportEventId).FirstOrDefault()?.LessonId).FirstOrDefault()?.GradeLevelId).FirstOrDefault()?.Description
+                    @Sports?.Where(x => x.SportId == SportEvents.Where(x => x.SportEventId == trainee.SportEventId).FirstOrDefault()?.SportId).FirstOrDefault()?.SportDescription
+            </strong>
+                
+            </div>
+            <div class="text-white bg-secondary">Status</div>
+            @if (trainee.Accepted)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" disabled checked>
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Accepted
+                    </label>
+                </div>
+            }
+            else
+            {
+                <div class="form-check">
+                    <input class="form-check-input border-danger" type="checkbox" value="" id="flexCheckDefault" @onclick="()=>UpdateState(trainee.TraineeId)">
+                    <label class="form-check-label text-danger" for="flexCheckDefault">
+                        <b>Confirm Attendance</b>
+                    </label>
+                </div>
+            }
+            @if (trainee.Attended)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" disabled checked>
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Attended
+                    </label>
+                </div>
+            }
+            else
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" disabled>
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Not Attended
+                    </label>
+                </div>
+            }
+            @if (trainee.Accepted)
+            {
+                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#@trainee.TraineeId">
+                    Add Activity Description
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#@trainee.TraineeId" disabled>
+                    Add Activity Description
+                </button>
+            }
+            <div class="modal fade" id="@trainee.TraineeId" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header"><h1 class="modal-title fs-5" id="staticBackdropLabel">Add Activity</h1></div>
+                            <div class="modal-body">
+                                Description
+                                <InputText style="width:100%" @bind-Value="Activity.Description"></InputText>
+                            </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="() => SubmitActivity(Activity, trainee.TraineeId)">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="text-white bg-secondary">Activities</div>
+            <div class="list-group mb-2">
+                @if(trainee.Activities is not null)
+                {
+                    @foreach (Activity act in trainee.Activities)
+                    {
+                        <label class="list-group-item">
+                            <div class="row">
+                                <div class="col">
+                                    @act.Description
+                                </div>
+                                <div class="col">
+                                    @if (act.IsCompleted)
+                                    {
+                                        <input class="form-check-input me-1" type="checkbox" value="" disabled checked>
+                                        <label>Completed</label>
+                                    }
+                                    else
+                                    {
+                                        <input class="form-check-input me-1" type="checkbox" value="" @onclick="() => UpdateActivity(act.ActivityId)">
+                                        <label>Check to complete</label>
+
+                                    }                                    
+                                </div>
+                            </div>
+                        </label>
+                    }
+                }
+                else
+                {
+                 <div>No Activities for this event</div>
+                }
+            </div>
+            <div class="text-white bg-secondary">Equipments Issued</div>
+            <div class="row">
+                <div class="col bg-light">Description</div>
+                <div class="col bg-light">Serial Number</div>
+                <div class="col bg-light">Status</div>
+            </div>
+            <div class="list-group">
+                @if (trainee.Equipments is not null)
+                {
+                    @foreach (var eqp in trainee.Equipments)
+                    {
+                        <label class="list-group-item">
+                            <div class="row">
+                                <div class="col">@equipments.Where(x => x.EquipmentId == eqp.EquipmentId).FirstOrDefault().Description</div>
+                                <div class="col">@eqp.SerialNumber</div>
+                                <div class="col">
+                                    @if (eqp.Status)
+                                    {
+                                        <input class="form-check-input me-1" type="checkbox" value="" disabled checked>
+                                        <label>Returned</label>
+                                    }
+                                    else
+                                    {
+                                        <input class="form-check-input me-1" type="checkbox" value="" disabled>
+                                        <label>Unreturned</label>
+                                    }
+                                </div>
+                            </div>
+                        </label>
+                    }
+                }
+                else
+                {
+                    <div>No Equipments allocated for this event</div>
+                }
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div>No events</div>
+}
+
+
+
+

@@ -1,0 +1,75 @@
+﻿@page "/"
+@using ChampionSports.Data
+@using ChampionsDbHelper.Data
+@using ChampionsDbHelper.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@inject ISportEventData eventsData
+@inject ILessonData lessonData
+@inject ISportData sportData
+@inject IGradeLevelData gradeLevelData
+@inject UserManager<ApplicationUser> usermanager
+
+
+@if(sportEvents is null)
+{
+    <h5>Loading.....</h5>
+}
+else
+{
+    if(_dates.Count() > 0)
+    {
+        @foreach (var date in _dates.Distinct().OrderByDescending(x => x.Ticks))
+        {
+            <div class="bg-info">
+                <table class="bg-info">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row" width="500px">
+                            </th>
+                            <td class="text-white"><b>@date.ToShortDateString()</b></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="container bg-light mb-2">
+                <table class="table border-1">
+                    <thead>
+                        <tr>
+                            <th scope="col">Description</th>
+                            <th scope="col">Start Time</th>
+                            <th scope="col">End Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sp in sportEvents.Where(x => x.EventDate == date))
+                        {
+                            <tr>
+                                <th scope="row" width="500px">
+                                    @gradeLevels.Where(x => x.GradeLevelId == lessons?.Where(x => x.LessonId == sp.LessonId).FirstOrDefault()?.GradeLevelId).FirstOrDefault()?.Description
+                                    @sports?.Where(x => x.SportId == sp.SportId).FirstOrDefault()?.SportDescription
+                                </th>
+                                <td> @sp.StartTime </td>
+                                <td> @sp.EndTime </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+    else
+    {
+        <h3 class="text-info">No Upcoming Matches</h3>
+    }
+}
+
+

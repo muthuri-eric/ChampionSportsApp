@@ -1,0 +1,99 @@
+﻿@page "/equipments"
+@attribute [Authorize]
+@using ChampionsDbHelper.Models
+@using ChampionsDbHelper.Data
+@using Microsoft.AspNetCore.Authorization
+@inject IEquipmentData equipmentData
+@inject ISportData sportData
+
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-1">
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            Add
+        </button>
+    </div>
+</div>
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Equipment</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm FormName="createequipment" Model="equipment" OnSubmit="CreateEquipments">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="description-id">Sport</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputSelect style="width:60%" id="description-id" @bind-Value="equipment.SportId">
+                                @if (sports is not null)
+                                {
+                                    <option value=""></option>
+                                    @foreach (var sport in sports)
+                                    {
+                                        <option value="@sport.SportId"> @sport.SportDescription</option>
+                                    }
+                                }
+                            </InputSelect>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="description-text">Equipment Type</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputText style="width:60%" id="description-text" @bind-Value="equipment.Description" />
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="description-text">Quantity</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputNumber style="width:60%" id="description-text" @bind-Value="equipment.StockCount" />
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col bg-secondary text-white">Equipment Type</div>
+        <div class="col bg-secondary text-white">Quantity Available</div>
+
+    </div>
+</div>
+
+@if (equipments is null)
+{
+    <h5>Loading.....</h5>
+}
+else
+    foreach (Equipment  equipment in equipments)
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col bg-light">@equipment.Description</div>
+                <div class="col bg-light">@equipment.StockCount</div>
+            </div>
+        </div>
+    }
+

@@ -1,0 +1,124 @@
+﻿@page "/equipmentdetail/{SportEventId:int}/{ParticipantId:int}"
+@attribute [Authorize]
+@using ChampionsDbHelper.Data
+@using ChampionsDbHelper.Models
+@using Microsoft.AspNetCore.Authorization
+@inject ITraineeData traineeData
+@inject IEquipmentDetailData equipmentDetailData
+@inject ISportEventData sportEventData
+@inject IEquipmentData equipmentData
+
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-1">
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#staticBackdrop1">
+            Add
+        </button>
+    </div>
+
+</div>
+<div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="static-BackdropLabel" aria-hidden="true">
+    <div>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <label for="sport-event-participants">Available Equipments</label>
+                </div>
+                <EditForm FormName="createEquipment" Model="@Detail" OnSubmit="SetEquipmentDetail">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col col-3">
+                                <label for="form-select">Equipment Type</label>
+                        </div>
+                        <div class="col col-7 mb-2">
+                                <InputSelect class="form-select" @bind-Value="@Detail!.EquipmentId">
+                                    @if (AvailableEquipments is not null)
+                                    {
+                                        <option value=""></option>
+                                        @foreach (var equipment in AvailableEquipments)
+                                        {
+                                            <option value="@equipment.EquipmentId">@equipment.Description</option>
+                                        }
+                                    }
+                                </InputSelect>
+                        </div> 
+                    </div>
+
+                    <div class="row">
+                            <div class="col col-3"><label for="description-text">Serial Number</label></div>
+                            <div class="col col-7">
+                                <InputText id="description-text" @bind-Value="Detail.SerialNumber" />
+                            </div>                           
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    @if (equipmentDetails is not null && equipmentDetails.Count() > 0)
+    {
+            <div class="row">
+                <div class="col bg-secondary text-white">Serial Number/Lookup Code</div>
+                <div class="col bg-secondary text-white">Equipment Type</div>
+                <div class="col bg-secondary text-white">Issue Date</div>
+                <div class="col bg-secondary text-white">Return Date</div>
+                <div class="col bg-secondary text-white">Returned</div>
+            </div>
+    }
+    else
+    {
+        <h3>No equipments allocated</h3>
+    }
+</div>
+<div class="container">
+    @if(equipmentDetails is not null)
+    {
+        @foreach (var detail in equipmentDetails)
+        {
+            <div class="row">
+                <div class="col">@detail.SerialNumber</div>
+                <div class="col">@Equipments.Where(x => x.EquipmentId == detail.EquipmentId).FirstOrDefault().Description</div>
+                <div class="col">@detail.IssueDate</div>
+                @if (detail.ReturnDate == DateTime.MinValue)
+                {
+                    <div class="col"></div>
+                }
+                else
+                {
+                    <div class="col">@detail.ReturnDate</div>
+                }   
+                <div class="col">
+                    @if(detail.Status)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked disabled>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" @onclick="() => UpdateState(detail.EquipmentDetailId)">
+                        </div>
+                    }
+                    </div>
+            </div>
+        }
+    }
+    else
+    {
+        <h3>No detail found</h3>
+    }
+</div>
+
+

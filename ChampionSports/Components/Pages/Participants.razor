@@ -1,0 +1,237 @@
+﻿@page "/participants/{PageRoute}"
+@attribute [Authorize]
+@using ChampionsDbHelper.Data
+@using ChampionsDbHelper.Models
+@using Microsoft.AspNetCore.Authorization
+@inject NavigationManager navManager
+@inject IStudentData studentData
+@inject IEquipmentData equipmentData
+@inject ITraineeData traineeData
+@inject ISportEventData sportEventData
+@inject ILessonData lessonData
+@inject IGradeLevelData gradeLevelData
+@inject ISportData sportData
+@inject IActivityData activityData
+@rendermode InteractiveServer
+
+@if(sportEvent is not null)
+{
+    <b>
+        <div class="row bg-light mb-2">
+            <div class="col">
+                <strong>EVENT :</strong> @gradeLevel?.Description
+                @sport?.SportDescription
+            </div>
+            <div class="col">
+                <strong>Sport Event Time :</strong>
+                @sportEvent.StartTime
+            </div>
+            <div class="col">
+                <strong>Venue :</strong>
+                @sportEvent.Location
+            </div>
+        </div>
+    </b>
+
+
+    <div>
+        <div class="row mb-2">
+            <div class="col">
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#participantBackdrop">
+                    Add Trainees
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col bg-secondary text-white">Student Number</div>
+            <div class="col bg-secondary text-white">First Name</div>
+            <div class="col bg-secondary text-white">Last Name</div>
+            <div class="col bg-secondary text-white">Confirmed</div>
+            <div class="col bg-secondary text-white">Attended</div>
+            <div class="col bg-secondary text-white">Equipments</div>
+            <div class="col bg-secondary text-white">Activities</div>
+        </div>
+        @if (participants is not null && participants.Count() > 0)
+        {
+            if (trainees.Count() > 0)
+            {
+                @foreach (var trainee in trainees)
+                {
+                    <div class="row">
+                        <div class="col">@students.Where(x => x.StudentId == trainee.StudentId).FirstOrDefault().StudentNumber</div>
+                        <div class="col">@students.Where(x => x.StudentId == trainee.StudentId).FirstOrDefault().FirstName</div>
+                        <div class="col">@students.Where(x => x.StudentId == trainee.StudentId).FirstOrDefault().LastName</div>
+                        <div class="col">
+                            @if (trainee.Accepted)
+                            {
+                                <input class="form-check-input" type="checkbox" value="" disabled checked />
+                            }
+                            else
+                            {
+                                <input class="form-check-input" type="checkbox" value="" disabled />
+                            }
+                        </div>
+                        <div class="col">
+                            @if (trainee.Attended)
+                            {
+                                <input class="form-check-input" type="checkbox" value="" checked @onclick="()=>
+                                UpdateState(trainee.TraineeId)"/>
+                            }
+                            else
+                            {
+                                if (trainee.Accepted)
+                                {
+                                    <input class="form-check-input" type="checkbox" value="" @onclick="() => UpdateState(trainee.TraineeId)" />
+                                }
+                                else
+                                {
+                                    <input class="form-check-input" type="checkbox" value="" disabled />
+                                }
+                                
+                            }
+                        </div>
+                        <div class="col">
+                            <button class="btn bg-light btn-sm" @onclick="() => LoadEquipmentDetail(trainee.SportEventId, trainee.TraineeId)">View</button>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#activitybackdrop">
+                                Activities <span class="badge text-danger">@activities.Where(x => x.TraineeId == trainee.TraineeId).Count()</span>
+                            </button>
+                        </div>
+                        <div class="modal fade" id="activitybackdrop" data-bs-backdrop="static" tabindex="-1" aria-labelledby="static-BackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">Activities</div>
+                                    <div class="modal-body">
+                                        <div>
+                                            <div class="bg-dark text-white">Complete</div>
+                                            <label class="list-group-item">
+                                                @foreach (var activity in trainee.Activities.Where(x => x.IsCompleted == true))
+                                                {
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            @activity.Description
+                                                        </div>
+                                                        <div class="col">
+                                                            <input class="form-check-input me-1" type="checkbox" value="" disabled checked>
+                                                            Completed
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </label>
+                                            <div class="bg-dark text-white">Incomplete</div>
+                                            <label class="list-group-item">
+                                                @foreach (var activity in trainee.Activities.Where(x => x.IsCompleted == false))
+                                                {
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            @activity.Description
+                                                        </div>
+                                                        <div class="col">
+                                                            <input class="form-check-input me-1" type="checkbox" value="" disabled>
+                                                            Incomplete
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </label>
+                                        </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <h3>No trainees yet</h3>
+            }
+        }
+        else
+        {
+            <h3>No participants available</h3>
+        }
+    </div>
+
+    <div class="modal fade" id="participantBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="static-BackdropLabel" aria-hidden="true">
+        <div>
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <label for="sport-event-participants"> Participants</label>
+                    </div>
+                    <EditForm FormName="createtrainee" Model="@trainees" OnValidSubmit="SaveTrainees">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="modal-body">
+                            <select class="form-select" @bind="participantStudentIds" multiple>
+                                @if (participants is not null)
+                                {
+                                    @foreach (var student in participants)
+                                    {
+                                        if(trainees is not null && trainees.Count() > 0)
+                                        {
+                                            foreach (var trainee in trainees.Where(x => x.SportEventId == sportEvent.SportEventId))
+                                            {
+                                                if (trainee.StudentId != student.StudentId)
+                                                {
+                                                    <option value="@student.StudentId">@student.FirstName @student.LastName</option>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="@student.StudentId">@student.FirstName @student.LastName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Select</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </EditForm>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="static-BackdropLabel" aria-hidden="true">
+        <div>
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <label for="sport-event-participants">Link Equipment</label>
+                    </div>
+                    <div class="modal-body">
+                        <select multiple>
+                            @if (equipments is not null)
+                            {
+                                <option>Link sport gear</option>
+                                @foreach (var equipment in equipments)
+                                {
+                                    <option> @equipment.Description</option>
+                                }
+
+                            }
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">@selectedEquipments?.FirstOrDefault()</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+

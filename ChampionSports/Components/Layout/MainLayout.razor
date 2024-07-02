@@ -1,0 +1,85 @@
+﻿@using ChampionSports.Data
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@inject NavigationManager navigationManager
+@inject UserManager<ApplicationUser> userMgr
+@inject RoleManager<IdentityRole> roleManager
+@inherits LayoutComponentBase
+
+@attribute [Authorize]
+
+<div class="page">
+<AuthorizeView>
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+</AuthorizeView>
+    <main>
+        <div class="top-row px-4">
+            <AuthorizeView>
+                <Authorized>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="Account/Manage">
+                            <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <form action="Account/Logout" method="post">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                            <button type="submit" class="nav-link">
+                                <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                            </button>
+                        </form>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="col">
+                        <div class="row">
+                            <div class="label d-flex justify-content-center" style="align-content:center">
+                                <div class="text-success"><strong>
+                                    <h5>Welcome to Champions Sports Management System</h5>
+                                    </strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    @if (!adminSet)
+                    {
+                        <div class="nav-item px-3">
+                            <NavLink class="nav-link" href="Account/Register">
+                                <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
+                            </NavLink>
+                        </div>
+                    }
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="Account/Login">
+                            <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span>
+                            <strong><h5>Login</h5></strong>
+                        </NavLink>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+@code{
+    private string? currentUrl;
+    private IList<ApplicationUser>? users;
+    private bool adminSet;
+    protected override async Task OnInitializedAsync()
+    {
+        users = await userMgr.GetUsersInRoleAsync("Admin");
+        adminSet = users.Count > 0 ? true : false;
+    }
+}
+
