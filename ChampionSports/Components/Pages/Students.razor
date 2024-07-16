@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.Identity
 
 @inject IStudentData studentData
+@inject IGradeLevelData gradeLevelData
 @inject IUserStore<ApplicationUser> UserStore
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -36,26 +37,36 @@
             <EditForm FormName="createtrainer" Model="@student" OnSubmit="AddStudent">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-            <div class="modal-body">
-
-                    <div>
-                        <div class="col-3">
-                            <label for="studentnumber">StudentNumber</label>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="studentnumber">Student Number</label>
                         </div>
                         <div class="col-7 mb-2">
                             <InputText style="width:60%" id="studentnumber" @bind-Value="student.StudentNumber" />
                         </div>
                     </div>
-                    <div>
-                        <div class="col-3">
+                    <div class="row">
+                        <div class="col-4">
                             <label for="gradelevel">Grade</label>
                         </div>
                         <div class="col-7 mb-2">
-                            <InputNumber style="width:60%" id="gradelevel" @bind-Value="student.GradeLevelId" />
+                            <InputSelect style="width:60%" id="gradelevel" @bind-Value="student.GradeLevelId">
+                                @if (gradeLevels is not null)
+                                {
+                                    <option value=""></option>
+                                    @foreach (var gradeLevel in gradeLevels)
+                                    {
+                                        <option value="@gradeLevel.GradeLevelId"> Grade @gradeLevel.GradeNumber</option>
+                                    }
+                                }
+                            </InputSelect>
                         </div>
+
                     </div>
-                    <div>
-                        <div class="col-3">
+
+                    <div class="row">
+                        <div class="col-4">
                             <label for="gender">Gender</label>
                         </div>
                         <div class="col-7 mb-2">
@@ -65,8 +76,9 @@
                             </InputSelect>
                         </div>
                     </div>
-                    <div>
-                        <div class="col-3">
+
+                    <div class="row">
+                        <div class="col-4">
                             <label for="firstname-text">First Name</label>
                         </div>
                         <div class="col-7 mb-2">
@@ -74,20 +86,22 @@
                             <InputText style="width:60%" id="firstname-text" @bind-Value="student.FirstName" />
                         </div>
                     </div>
-                    <div>
-                        <div class="col-3">
+
+                    <div class="row">
+                        <div class="col-4">
                             <label for="lastname-text">Last Name</label>
                         </div>
                         <div class="col-7 mb-2">
                             <InputText style="width:60%" id="lastname-text" @bind-Value="student.LastName" />
                         </div>
 
-                    </div>   
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </EditForm>
         </div>
     </div>
@@ -99,7 +113,7 @@
                 <h1 class="modal-title fs-5">Add as user</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-<div class="row m-2 mb-5">
+            <div class="row m-2 mb-5">
     <div class="col-md-12">
         <StatusMessage Message="@Message" />
         <EditForm Model="Input"  method="post" OnValidSubmit="RegisterUser" FormName="register">
@@ -142,7 +156,6 @@
         </div>
     </div>
 </div>
-
 <div class="container">
     <div class="row">
         <div class="col-3 bg-secondary text-white">Student Number</div>

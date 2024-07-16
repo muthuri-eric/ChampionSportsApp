@@ -9,14 +9,18 @@
 @rendermode InteractiveServer
 
 <div class="row">
-    <div class="col-1">
-        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-            Add
+    <div class="col-3">
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#typebackdrop">
+             Add Equipment Type
+        </button>
+    </div>
+    <div class="col-3">
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#qtybackdrop">
+            Add Quantity
         </button>
     </div>
 </div>
-
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="typebackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -28,7 +32,7 @@
                 <ValidationSummary />
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-3">
+                        <div class="col-4">
                             <label for="description-id">Sport</label>
                         </div>
                         <div class="col-7 mb-2">
@@ -47,16 +51,56 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-3">
+                        <div class="col-4">
                             <label for="description-text">Equipment Type</label>
                         </div>
                         <div class="col-7 mb-2">
-                            <InputText style="width:60%" id="description-text" @bind-Value="equipment.Description" />
+                            <InputText style="width:60%" id="description-id" @bind-Value="equipment.Description">
+                            </InputText>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="qtybackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Quantity</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <EditForm FormName="createequipment" Model="equipment" OnSubmit="UpdateEquipments">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="description-text">Equipment Type</label>
+                        </div>
+                        <div class="col-7 mb-2">
+                            <InputSelect style="width:60%" id="description-id" @bind-Value="equipment.EquipmentId">
+                                @if (equipments is not null)
+                                {
+                                    <option value=""></option>
+                                    @foreach (var equipment in equipments)
+                                    {
+                                        <option value="@equipment.EquipmentId"> @equipment.Description</option>
+                                    }
+                                }
+                            </InputSelect>
                         </div>
 
                     </div>
                     <div class="row">
-                        <div class="col-3">
+                        <div class="col-4">
                             <label for="description-text">Quantity</label>
                         </div>
                         <div class="col-7 mb-2">

@@ -16,12 +16,15 @@ public class EquipmentDetailData : IEquipmentDetailData
 {
     private readonly ISqlDataAccess _db;
     private readonly IConfiguration _config;
+    private readonly IEquipmentData _equipmentData;
 
-    public EquipmentDetailData(ISqlDataAccess db, IConfiguration config)
+    public EquipmentDetailData(ISqlDataAccess db, IConfiguration config, IEquipmentData equipmentData)
     {
         _db = db;
         _config = config;
+        _equipmentData = equipmentData;
     }
+
     public async Task<IEnumerable<EquipmentDetail>> GetEquipmentDetailByTraineeIdAsync(int sportEventId, int participantId)
     {
         return await _db.FetchData<EquipmentDetail, dynamic>($"select * from dbo.EquipmentDetail where SportEventId = {sportEventId}" +
@@ -51,12 +54,10 @@ public class EquipmentDetailData : IEquipmentDetailData
             await connection.ExecuteAsync("spEquipmentUpdate", new
             {
                 equipment.EquipmentId,
-                equipment.SportId,
-                equipment.Description,
                 equipment.StockCount
             }, transaction, commandType: CommandType.StoredProcedure);
         }
-        catch (Exception ex)
+        catch
         {
             transaction.Rollback();
             throw;
@@ -64,18 +65,38 @@ public class EquipmentDetailData : IEquipmentDetailData
         transaction.Commit();
         connection.Close();
     }
-    public async Task UpdateEquipmentDetail(EquipmentDetail detail)
+    public async Task UpdateEquipmentDetail(EquipmentDetail detail, Equipment equipment, string connectionId = "Default")
     {
-        await _db.UpdateDataAsync("spEquipmentDetailUpdate", new
+        using IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId));
+        connection.Open();
+        using var transaction = connection.BeginTransaction();
+        try
         {
-            detail.EquipmentDetailId,
-            detail.TraineeId,
-            detail.SportEventId,
-            detail.EquipmentId,
-            detail.SerialNumber,
-            detail.ReturnDate,
-            detail.IssueDate,
-            detail.Status,
-        });
+            await connection.ExecuteAsync("spEquipmentDetailUpdate", new
+            {
+                detail.EquipmentDetailId,
+                detail.TraineeId,
+                detail.SportEventId,
+                detail.EquipmentId,
+                detail.SerialNumber,
+                detail.ReturnDate,
+                detail.IssueDate,
+                detail.Status,
+            }, transaction, commandType: CommandType.StoredProcedure);
+            var equipmentType = await _equipmentData.GetEquipmentByIdAsync(equipment.EquipmentId);
+            var newstockCount = equipmentType?.StockCount;
+            await connection.ExecuteAsync("spEquipmentUpdate", new
+            {
+                equipment.EquipmentId,
+                StockCount = newstockCount + 1,
+            }, transaction, commandType:CommandType.StoredProcedure);
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+        transaction.Commit();
+        connection.Close();
     }
 }

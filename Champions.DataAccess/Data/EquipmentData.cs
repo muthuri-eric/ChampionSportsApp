@@ -35,17 +35,18 @@ public class EquipmentData : IEquipmentData
     {
         return await _db.FetchData<Equipment, dynamic>($"select * from dbo.Equipment where StockCount > 0 AND SportId = {sportId}");
     }
-    public async Task<IEnumerable<Equipment>> GetEquipmentByIdAsync(int id)
+    public async Task<Equipment?> GetEquipmentByIdAsync(int id)
     {
-        return await _db.FetchData<Equipment, dynamic>("spEquipmentGetById", new { Id = id });
+        var results = await _db.FetchData<Equipment, dynamic>("spEquipmentGetById", new { EquipmentId = id });
+        return results.FirstOrDefault();
     }
     public async Task UpdateEquipmentDataAsync(Equipment equipment)
     {
+        var equipmentType = await GetEquipmentByIdAsync(equipment.EquipmentId);
         await _db.UpdateDataAsync("spEquipmentUpdate", new
         {
-            equipment.SportId,
-            equipment.Description,
-            equipment.StockCount
+            equipment.EquipmentId,
+            StockCount = equipment.StockCount + equipmentType?.StockCount,
         });
     }
 }

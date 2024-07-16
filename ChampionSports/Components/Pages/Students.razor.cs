@@ -1,3 +1,4 @@
+using ChampionsDbHelper.Data;
 using ChampionsDbHelper.Models;
 using ChampionSports.Data;
 using Microsoft.AspNetCore.Components;
@@ -11,12 +12,14 @@ public partial class Students
     private InputModel Input { get; set; } = new();
     private Student student = new();
     private IEnumerable<Student>? students;
+    private IEnumerable<GradeLevel>? gradeLevels;
     private Student? updatedStudent = new();
     private int studentId;
     private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
     protected async override Task OnInitializedAsync()
     {
         students = await studentData.GetAllStudentDataAsync();
+        gradeLevels = await gradeLevelData.GetAllGradeLevelDataAsync();
     }
     private async Task AddStudent()
     {

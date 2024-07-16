@@ -72,9 +72,13 @@ public partial class Matches
     }
     private async Task CreateSportEvent()
     {
-        sportEvent.StartTime = lessons.Where(x => x.LessonId == sportEvent.LessonId).FirstOrDefault()!.StartTime;
-        sportEvent.EndTime = lessons.Where(x => x.LessonId == sportEvent.LessonId).FirstOrDefault()!.EndTime;
-        await eventsData.SaveSportEventDataAsync(sportEvent);
+        if(lessons is not null && sportEvent.SportEventId != 0)
+        {
+            sportEvent.StartTime = lessons.Where(x => x.LessonId == sportEvent.LessonId).FirstOrDefault()!.StartTime;
+            sportEvent.EndTime = lessons.Where(x => x.LessonId == sportEvent.LessonId).FirstOrDefault()!.EndTime;
+            await eventsData.SaveSportEventDataAsync(sportEvent);
+        }
+
     }
     private void LoadParticipants(int sportEventId)
     {

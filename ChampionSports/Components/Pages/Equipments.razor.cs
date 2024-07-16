@@ -16,4 +16,9 @@ public partial class Equipments
         await equipmentData.SaveEquipmentDataAsync(equipment);
 
     }
+    public async Task UpdateEquipments()
+    {
+
+        await equipmentData.UpdateEquipmentDataAsync(equipment);
+    }
 }
