@@ -55,7 +55,7 @@ public partial class Matches
             sportEvents = await eventsData.GetUserSportEvents(trainers.Where(x => x.Id == _loggedInUser.Id).FirstOrDefault().TrainerId);
             foreach (var sp in sportEvents)
             {
-                sp.EventDate = lessons.Where(x => x.LessonId == sp.LessonId).FirstOrDefault().LessonDate;
+                sp.EventDate = lessons.Where(x => x.LessonId == sp.LessonId).FirstOrDefault()!.LessonDate;
                 var sptrainees = await traineeData.GetTraineeBySportEventIdAsync(sp.SportEventId);
                 if (sptrainees is not null && sptrainees.Count() > 0)
                 {
