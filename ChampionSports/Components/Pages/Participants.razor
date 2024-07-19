@@ -94,11 +94,11 @@
                             <button class="btn bg-light btn-sm" @onclick="() => LoadEquipmentDetail(trainee.SportEventId, trainee.TraineeId)">View</button>
                         </div>
                         <div class="col">
-                            <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#activitybackdrop">
+                            <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#@trainee.TraineeId">
                                 Activities <span class="badge text-danger">@activities.Where(x => x.TraineeId == trainee.TraineeId).Count()</span>
                             </button>
                         </div>
-                        <div class="modal fade" id="activitybackdrop" data-bs-backdrop="static" tabindex="-1" aria-labelledby="static-BackdropLabel" aria-hidden="true">
+                        <div class="modal fade" id="@trainee.TraineeId" data-bs-backdrop="static" tabindex="-1" aria-labelledby="static-BackdropLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">Activities</div>

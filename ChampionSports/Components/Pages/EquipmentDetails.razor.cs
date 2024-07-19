@@ -27,31 +27,28 @@ public partial class EquipmentDetails
     }
     private async Task SetEquipmentDetail()
     {
-        if(AffectedEquipment?.EquipmentId != 0)
+        AffectedEquipment = new Equipment
         {
-            AffectedEquipment = new Equipment
-            {
-                EquipmentId = AvailableEquipments!.Where(x => x.EquipmentId == Detail!.EquipmentId).FirstOrDefault()!.EquipmentId,
-                SportId = AvailableEquipments!.Where(x => x.EquipmentId == Detail!.EquipmentId).FirstOrDefault()!.SportId,
-                Description = AvailableEquipments!.Where(x => x.EquipmentId == Detail!.EquipmentId).FirstOrDefault()!.Description,
-                StockCount = AvailableEquipments!.Where(x => x.EquipmentId == Detail!.EquipmentId).FirstOrDefault()!.StockCount - 1
+            EquipmentId = AvailableEquipments!.Where(x => x.EquipmentId == Detail!.EquipmentId).FirstOrDefault()!.EquipmentId,
+            SportId = AvailableEquipments!.Where(x => x.EquipmentId == Detail!.EquipmentId).FirstOrDefault()!.SportId,
+            Description = AvailableEquipments!.Where(x => x.EquipmentId == Detail!.EquipmentId).FirstOrDefault()!.Description,
+            StockCount = AvailableEquipments!.Where(x => x.EquipmentId == Detail!.EquipmentId).FirstOrDefault()!.StockCount - 1
 
-            };
-            if (AvailableEquipments is not null )
+        };
+        if (AvailableEquipments is not null)
+        {
+            await equipmentDetailData.InsertEquipmentDetail(new EquipmentDetail
             {
-                await equipmentDetailData.InsertEquipmentDetail(new EquipmentDetail
-                {
-                    EquipmentId = Detail.EquipmentId,
-                    TraineeId = ParticipantId,
-                    SportEventId = SportEventId,
-                    SerialNumber = Detail.SerialNumber,
-                    Status = false
-                }, AffectedEquipment);
-            }
-            else
-            {
-                throw new Exception();
-            }
+                EquipmentId = Detail.EquipmentId,
+                TraineeId = ParticipantId,
+                SportEventId = SportEventId,
+                SerialNumber = Detail.SerialNumber,
+                Status = false
+            }, AffectedEquipment);
+        }
+        else
+        {
+            throw new Exception();
         }
     }
     private async Task UpdateState(int id)

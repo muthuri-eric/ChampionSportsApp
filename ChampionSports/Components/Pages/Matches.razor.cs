@@ -72,7 +72,7 @@ public partial class Matches
     }
     private async Task CreateSportEvent()
     {
-        if(lessons is not null && sportEvent.SportEventId != 0)
+        if(lessons is not null)
         {
             sportEvent.StartTime = lessons.Where(x => x.LessonId == sportEvent.LessonId).FirstOrDefault()!.StartTime;
             sportEvent.EndTime = lessons.Where(x => x.LessonId == sportEvent.LessonId).FirstOrDefault()!.EndTime;
